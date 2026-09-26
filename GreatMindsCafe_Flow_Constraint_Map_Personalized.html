@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Great Minds Café — Flow & Constraint Map</title>
+<style>
+:root{
+ --bg:#04150f;--panel:#0a2118;--panel2:#0e2d20;--panel3:#123a29;
+ --ink:#edf8ef;--muted:#9db9a8;--line:#1f4a35;
+ --green:#a8d66d;--mint:#6fc69a;--deep:#071c14;
+ --red:#e46d62;--amber:#e4b75d;--good:#83cf8d;
+ --shadow:0 22px 55px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+ radial-gradient(circle at 12% 0%,rgba(68,130,91,.24),transparent 28%),
+ radial-gradient(circle at 92% 18%,rgba(168,214,109,.12),transparent 25%),
+ linear-gradient(135deg,#061b12,#03100b 72%);
+ color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:1440px;margin:auto;padding:26px}
+.top{display:flex;justify-content:space-between;gap:22px;align-items:flex-start;margin-bottom:18px}
+.eyebrow{color:var(--green);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:900}
+h1{font-size:36px;line-height:1.02;letter-spacing:-1.4px;margin:6px 0}
+.sub{color:var(--muted);max-width:720px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.badge{border:1px solid #28553d;background:#092116;padding:7px 11px;border-radius:999px;color:#cfe8d7;font-weight:800;font-size:11px}
+.badge.hot{border-color:#6a403b;color:#ffd3cd}
+.grid{display:grid;grid-template-columns:1.65fr .85fr;gap:18px}
+.panel{background:linear-gradient(150deg,rgba(14,45,32,.97),rgba(7,27,19,.98));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.map{padding:13px;overflow:hidden}
+.mapbar{display:flex;justify-content:space-between;align-items:center;padding:7px 9px 12px}
+.mapbar strong{font-size:13px}.legend{display:flex;gap:14px;color:var(--muted);font-size:11px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+svg{width:100%;display:block;background:#061b13;border-radius:15px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{padding:17px}
+.card h2{margin:0 0 10px;font-size:15px}
+.kicker{font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:1.5px;font-weight:900}
+.big{font-size:34px;font-weight:950;letter-spacing:-1px}
+.muted{color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.stat{background:#071b13;border:1px solid #1c4432;border-radius:12px;padding:11px}
+.stat b{display:block;font-size:19px}.stat span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}
+.moves{display:flex;gap:6px;margin:12px 0}
+.moves button{flex:1;background:#071b13;border:1px solid #28553d;color:#cce4d3;border-radius:9px;padding:9px 5px;font-weight:900;cursor:pointer}
+.moves button:hover{border-color:var(--green);transform:translateY(-1px)}
+.moves button.active{background:var(--green);color:#102115;border-color:var(--green)}
+.move-title{font-weight:900;font-size:16px}.move-desc{color:#c9ded0;font-size:12px;margin-top:4px}
+.verdict{margin-top:11px;padding:11px 12px;border-left:3px solid var(--amber);background:#0a2017;border-radius:8px;font-size:12px}
+.verdict.good{border-color:var(--good)}
+.verdict.warn{border-color:var(--amber)}
+.brief{margin-top:14px}
+.brief-row{border-top:1px solid var(--line);padding:10px 0}
+.brief-row:first-child{border-top:0}.brief-row b{display:block;color:var(--green);font-size:10px;text-transform:uppercase;letter-spacing:1px}.brief-row p{margin:3px 0;color:#d8e9dc;font-size:12px}
+.full{margin-top:18px}
+.full .inner{padding:17px}
+.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.table th{font-size:10px;color:#82aa95;text-transform:uppercase;letter-spacing:.7px}.table tr.sel{background:rgba(168,214,109,.11)}.table tr.sel td:first-child{color:var(--green);font-weight:900}
+.callout{margin-top:13px;background:linear-gradient(135deg,#0c3021,#092217);border:1px solid #28553d;padding:15px;border-radius:13px}
+.callout strong{color:var(--green)}
+.footer{text-align:center;color:#638b74;font-size:10px;padding:18px}
+svg .route{fill:none;stroke:#376a50;stroke-width:5;stroke-dasharray:10 10;animation:dash 1.15s linear infinite}
+svg .route.staff{stroke:#25513c;stroke-width:3;stroke-dasharray:7 9;animation-duration:1.55s;animation-direction:reverse}
+svg .route.express{stroke:var(--green);stroke-width:4;stroke-dasharray:7 7;filter:drop-shadow(0 0 5px rgba(168,214,109,.35))}
+@keyframes dash{to{stroke-dashoffset:-40}}
+.trav{filter:drop-shadow(0 0 7px rgba(168,214,109,.5));animation:travel 5s linear infinite}
+.trav.t2{animation-delay:-1.8s}.trav.t3{animation-delay:-3.3s}.trav.t4{animation-delay:-4.2s}
+@keyframes travel{0%{transform:translate(0,0);opacity:0}8%{opacity:1}25%{transform:translate(105px,0)}50%{transform:translate(215px,0)}75%{transform:translate(330px,0)}94%{opacity:1}100%{transform:translate(445px,0);opacity:0}}
+.worker{filter:drop-shadow(0 0 6px rgba(111,198,154,.4));animation:worker 4s ease-in-out infinite}.worker.w2{animation-delay:-1.8s}
+@keyframes worker{50%{transform:translateX(45px)}}
+.q{animation:pulse 1.3s ease-in-out infinite}.q2{animation-delay:.2s}.q3{animation-delay:.4s}.q4{animation-delay:.6s}.q5{animation-delay:.8s}
+@keyframes pulse{50%{r:7;opacity:.5}}
+.station{transition:.25s}.station.constraint rect{stroke:var(--red)!important;stroke-width:4}.station.warn rect{stroke:var(--amber)!important;stroke-width:3}.station.good rect{stroke:var(--good)!important;stroke-width:3}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.badges{justify-content:flex-start}.top{flex-direction:column}}
+@media(max-width:650px){.wrap{padding:15px}h1{font-size:28px}.stats{grid-template-columns:1fr}.legend{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Great Minds Café · BizCafe · Week 11 → Week 12</div>
+      <h1>Find the ceiling. Relieve it. Watch the next one.</h1>
+      <p class="sub">A real-results flow map built from our simulation data. The map separates what we observed from what we project after the staffing move.</p>
+    </div>
+    <div class="badges">
+      <span class="badge hot">PRIMARY CONSTRAINT · STAFFING</span>
+      <span class="badge">28 → 38 SERVERS</span>
+      <span class="badge">95.8% UTILIZATION</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="panel map">
+      <div class="mapbar">
+        <strong>LIVE OPERATIONS MAP</strong>
+        <div class="legend"><span><i style="background:#a8d66d"></i>Customer</span><span><i style="background:#6fc69a"></i>Staff</span><span><i style="background:#e46d62"></i>Constraint</span></div>
+      </div>
+      <svg viewBox="0 0 920 540" aria-label="Animated Great Minds Cafe flow map">
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect x="0" y="0" width="920" height="540" rx="18" fill="#061b13"/>
+        <text x="35" y="36" fill="#83a994" font-size="12" font-weight="800" letter-spacing="2">FRONTSTAGE · CUSTOMER FLOW</text>
+        <text x="35" y="320" fill="#6d9a82" font-size="11" font-weight="800" letter-spacing="2">BACKSTAGE · STAFF FLOW</text>
+
+        <!-- customer route -->
+        <path class="route" d="M75 160 H215 H365 H515 H665 H810"/>
+        <path class="route express" d="M215 125 H365 H515" opacity=".9"/>
+        <!-- staff route -->
+        <path class="route staff" d="M80 405 H220 V455 H365 V405 H515 V455 H665 V405 H810"/>
+
+        <!-- stations -->
+        <g class="station" id="s1"><rect x="35" y="120" width="90" height="75" rx="13" fill="#0c2c20" stroke="#29543e"/><text x="80" y="151" text-anchor="middle" fill="#b8d5c1" font-size="24">🚶</text><text x="80" y="178" text-anchor="middle" fill="#e9f5ec" font-size="11" font-weight="800">ARRIVAL</text></g>
+        <g class="station constraint" id="s2"><rect x="170" y="112" width="120" height="92" rx="13" fill="#0d2a20" stroke="#e46d62"/><text x="230" y="143" text-anchor="middle" fill="#ffd1cc" font-size="24">⏳</text><text x="230" y="170" text-anchor="middle" fill="#fff0ee" font-size="11" font-weight="900">STAFF / QUEUE</text><text x="230" y="188" text-anchor="middle" fill="#e98b82" font-size="9" font-weight="800">PRIMARY CEILING</text></g>
+        <g class="station" id="s3"><rect x="330" y="120" width="105" height="75" rx="13" fill="#0c2c20" stroke="#29543e"/><text x="382" y="151" text-anchor="middle" fill="#b8d5c1" font-size="24">☕</text><text x="382" y="178" text-anchor="middle" fill="#e9f5ec" font-size="11" font-weight="800">SERVICE</text></g>
+        <g class="station" id="s4"><rect x="480" y="120" width="105" height="75" rx="13" fill="#0c2c20" stroke="#29543e"/><text x="532" y="151" text-anchor="middle" fill="#b8d5c1" font-size="24">🤝</text><text x="532" y="178" text-anchor="middle" fill="#e9f5ec" font-size="11" font-weight="800">HANDOFF</text></g>
+        <g class="station" id="s5"><rect x="630" y="120" width="105" height="75" rx="13" fill="#0c2c20" stroke="#29543e"/><text x="682" y="151" text-anchor="middle" fill="#b8d5c1" font-size="24">🪑</text><text x="682" y="178" text-anchor="middle" fill="#e9f5ec" font-size="11" font-weight="800">SEATING</text></g>
+        <g class="station" id="s6"><rect x="780" y="120" width="105" height="75" rx="13" fill="#0c2c20" stroke="#29543e"/><text x="832" y="151" text-anchor="middle" fill="#b8d5c1" font-size="24">↗</text><text x="832" y="178" text-anchor="middle" fill="#e9f5ec" font-size="11" font-weight="800">EXIT</text></g>
+
+        <!-- queue -->
+        <circle class="q" cx="155" cy="225" r="5" fill="#e46d62"/><circle class="q q2" cx="177" cy="238" r="5" fill="#e46d62"/><circle class="q q3" cx="199" cy="251" r="5" fill="#e46d62"/><circle class="q q4" cx="221" cy="264" r="5" fill="#e46d62"/><circle class="q q5" cx="243" cy="277" r="5" fill="#e46d62"/>
+        <text x="155" y="302" fill="#e98b82" font-size="10" font-weight="800">PEAK QUEUE · 12–17 MIN</text>
+
+        <!-- moving customers -->
+        <circle class="trav" cx="75" cy="160" r="7" fill="#a8d66d"/><circle class="trav t2" cx="75" cy="160" r="7" fill="#a8d66d"/><circle class="trav t3" cx="75" cy="160" r="7" fill="#a8d66d"/><circle class="trav t4" cx="75" cy="160" r="7" fill="#a8d66d"/>
+        <!-- staff -->
+        <circle class="worker" cx="95" cy="405" r="6" fill="#6fc69a"/><circle class="worker w2" cx="285" cy="455" r="6" fill="#6fc69a"/>
+        <text x="35" y="500" fill="#6f9981" font-size="10">Real Week 11: 5,100 completed cups · 95.8% capacity utilization · 67.2% customer satisfaction</text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <section class="panel card">
+        <div class="kicker">Week 11 · actual simulation</div>
+        <div class="big">95.8%</div>
+        <div class="muted">capacity utilization — the café is operating near its ceiling.</div>
+        <div class="stats">
+          <div class="stat"><b>5,100</b><span>cups / completed journeys</span></div>
+          <div class="stat"><b>$39,931</b><span>revenue</span></div>
+          <div class="stat"><b>67.2%</b><span>customer satisfaction</span></div>
+          <div class="stat"><b>77.7%</b><span>wait-time satisfaction</span></div>
+        </div>
+      </section>
+
+      <section class="panel card">
+        <div class="kicker">Move selector · pressure test</div>
+        <div class="moves">
+          <button data-move="A">A</button><button data-move="B">B</button><button data-move="C" class="active">C</button><button data-move="D">D</button><button data-move="E">E</button>
+        </div>
+        <div id="moveTitle" class="move-title">C · Add 10 servers</div>
+        <div id="moveDesc" class="move-desc">Increase staffing from 28 to 38 servers to relieve the staffing constraint during peak demand.</div>
+        <div id="verdict" class="verdict good">Chosen move: C. The source analysis projects higher throughput and lower waiting, but cost per cup rises. The company-side win is higher projected revenue and net income.</div>
+        <div class="stats">
+          <div class="stat"><b id="journeys">6,300</b><span>projected completed cups</span></div>
+          <div class="stat"><b id="cost">$1.91</b><span>projected cost / cup</span></div>
+          <div class="stat"><b id="delta">+1,200</b><span>vs. 5,100 baseline</span></div>
+          <div class="stat"><b id="wait">4 min</b><span>projected wait</span></div>
+        </div>
+      </section>
+
+      <section class="panel card brief">
+        <div class="kicker">30-second decision brief</div>
+        <div class="brief-row"><b>1 · Binding constraint</b><p>Staffing is the binding constraint at peak; 28 servers are running at 95.8% capacity utilization.</p></div>
+        <div class="brief-row"><b>2 · One move · C</b><p>Add 10 servers, increasing staffing from 28 to 38, to create capacity during peak periods.</p></div>
+        <div class="brief-row"><b>3 · Proof</b><p>Completed cups rise from 5,100 to 6,300 (+1,200, about +23.5%). Cost to serve rises from $1.74 to $1.91 per cup (+$0.17).</p></div>
+        <div class="brief-row"><b>4 · Win–win?</b><p>Customers get much shorter waits (about 15 to 4 minutes). The company is projected to gain $15,000+ in revenue and $4,000+ in net income, although cost per cup increases.</p></div>
+        <div class="brief-row"><b>5 · Next constraint</b><p>Equipment capacity becomes the next ceiling to monitor; the source analysis says the current equipment can handle about 6,300 cups/week, but should be monitored as volume grows.</p></div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="panel full">
+    <div class="inner">
+      <div class="kicker">Actual → proposed · source analysis</div>
+      <h2 style="margin:4px 0 12px">The staffing move increases throughput — but it is not free</h2>
+      <div class="tablewrap">
+      <table class="table">
+        <thead><tr><th>Metric</th><th>Week 11 actual</th><th>Proposed after C</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr class="sel"><td>Completed journeys (cups)</td><td>5,100</td><td>6,300</td><td>+1,200 (+23.5%)</td></tr>
+          <tr><td>Abandoned journeys</td><td>~500</td><td>~200</td><td>−300</td></tr>
+          <tr><td>Revenue</td><td>$39,931</td><td>$55,000+</td><td>+$15,000+ (+37.5%)</td></tr>
+          <tr><td>Staff operating cost</td><td>$8,885/week</td><td>$12,046/week</td><td>+$3,161 (+35.6%)</td></tr>
+          <tr class="sel"><td>Cost to serve</td><td>$1.74 / cup</td><td>$1.91 / cup</td><td>+$0.17 (+9.8%)</td></tr>
+          <tr><td>Average wait</td><td>15 min</td><td>4 min</td><td>−11 min (−73%)</td></tr>
+          <tr><td>Capacity utilization</td><td>95.8%</td><td>~75%</td><td>−20.8 pp</td></tr>
+          <tr><td>Customer satisfaction</td><td>67.2%</td><td>73–74%</td><td>+6 pp</td></tr>
+          <tr><td>Net income</td><td>$23,755</td><td>$28,000+</td><td>+$4,000+ (+16.8%)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><strong>Honest takeaway:</strong> C is a customer-and-company win in the source analysis, but not because cost per journey falls. It rises by $0.17 per cup. The business case comes from the extra 1,200 completed cups, $15,000+ projected revenue gain, and $4,000+ projected net-income gain.</div>
+    </div>
+  </section>
+
+  <section class="panel full">
+    <div class="inner">
+      <div class="kicker">Why this constraint is credible</div>
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat"><b>28</b><span>current servers</span></div>
+        <div class="stat"><b>38</b><span>proposed servers</span></div>
+        <div class="stat"><b>15 → 4</b><span>minutes wait</span></div>
+        <div class="stat"><b>6,300</b><span>cups next state</span></div>
+      </div>
+      <div class="callout" style="margin-top:12px"><strong>Next ceiling:</strong> equipment. The source analysis says current Quad/Quad equipment can handle 6,300 cups/week, so equipment capacity should be monitored if volume continues to scale. Payment processing is not a limiting factor at 100+ transactions/hour, and physical queue space is considered adequate for 4–5 minute waits.</div>
+    </div>
+  </section>
+
+  <div class="footer">Great Minds Café · Flow & Constraint Map · Week 11 actuals + source-proposed Week 12 scenario · Estimates are labeled as projections.</div>
+</div>
+
+<script>
+const moves={
+A:{title:"A · Cut staffing",desc:"Cut staffing would ignore the observed staffing constraint and reduce completed journeys.",j:"4,400",cost:"$1.??",delta:"−700",wait:"20+ min",verdict:"Not selected. It moves against the observed constraint and would reduce capacity."},
+B:{title:"B · Buffer the queue",desc:"Add low/no-cost queue support around the staffing constraint without adding permanent capacity.",j:"5,500*",cost:"$1.74*",delta:"+400*",wait:"9 min*",verdict:"Possible buffer, but the source analysis directly supports added staffing as the capacity solution."},
+C:{title:"C · Add 10 servers",desc:"Increase staffing from 28 to 38 servers to relieve the staffing constraint during peak demand.",j:"6,300",cost:"$1.91",delta:"+1,200",wait:"4 min",verdict:"Chosen move: higher throughput and much shorter waits. Cost per cup rises, so the company win comes from additional volume and projected net income."},
+D:{title:"D · Resequence service",desc:"Change the sequence of work to remove blocking around the staffing bottleneck without adding 10 servers.",j:"5,700*",cost:"$1.75*",delta:"+600*",wait:"7 min*",verdict:"Not the source-supported move. Treat these as hypothetical only; do not present them as measured results."},
+E:{title:"E · Express lane",desc:"Create an express lane for simple orders to reduce pressure on the main queue.",j:"5,500*",cost:"$1.74*",delta:"+400*",wait:"8 min*",verdict:"Interesting pressure-test option, but no measured result in the source analysis."}
+};
+function setMove(k){
+ document.querySelectorAll('.moves button').forEach(b=>b.classList.toggle('active',b.dataset.move===k));
+ const m=moves[k];
+ document.getElementById('moveTitle').textContent=m.title;
+ document.getElementById('moveDesc').textContent=m.desc;
+ document.getElementById('journeys').textContent=m.j;
+ document.getElementById('cost').textContent=m.cost;
+ document.getElementById('delta').textContent=m.delta;
+ document.getElementById('wait').textContent=m.wait;
+ const v=document.getElementById('verdict'); v.textContent=m.verdict; v.className='verdict '+(k==='C'?'good':'warn');
+}
+document.querySelectorAll('.moves button').forEach(b=>b.addEventListener('click',()=>setMove(b.dataset.move)));
+</script>
+</body></html>
